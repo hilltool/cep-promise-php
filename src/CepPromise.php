@@ -27,12 +27,13 @@ class CepPromise
      * Normaliza o CEP dado e efetua as requisições.
      *
      * @param $cepRawValue
+     * @param array $mockHandlers
      *
      * @throws \Claudsonm\CepPromise\Exceptions\CepPromiseException
      *
      * @return \Claudsonm\CepPromise\Address
      */
-    public static function fetch($cepRawValue)
+    public static function fetch($cepRawValue, array $mockHandlers = null)
     {
         $promise = new FulfilledPromise($cepRawValue);
         $cepData = $promise
@@ -40,7 +41,7 @@ class CepPromise
             ->then(call_user_func([__CLASS__, 'removeSpecialCharacters']))
             ->then(call_user_func([__CLASS__, 'validateInputLength']))
             ->then(call_user_func([__CLASS__, 'leftPadWithZeros']))
-            ->then(call_user_func([__CLASS__, 'fetchCepFromProviders']))
+            ->then(call_user_func([__CLASS__, 'fetchCepFromProviders'], $mockHandlers))
             ->otherwise(call_user_func([__CLASS__, 'handleProvidersError']))
             ->otherwise(call_user_func([__CLASS__, 'throwApplicationError']))
             ->wait();
@@ -48,13 +49,13 @@ class CepPromise
         return Address::create($cepData);
     }
 
-    private static function fetchCepFromProviders()
+    private static function fetchCepFromProviders(array $mockHandlers = null)
     {
-        return function (string $cepWithLeftPad) {
+        return function (string $cepWithLeftPad) use ($mockHandlers) {
             $promises = array_merge(
-                ViaCepProvider::createPromiseArray($cepWithLeftPad),
-                CepAbertoProvider::createPromiseArray($cepWithLeftPad),
-                CorreiosProvider::createPromiseArray($cepWithLeftPad)
+                ViaCepProvider::createPromiseArray($cepWithLeftPad, $mockHandlers[ViaCepProvider::PROVIDER_IDENTIFIER] ?? null),
+                CepAbertoProvider::createPromiseArray($cepWithLeftPad, $mockHandlers[CepAbertoProvider::PROVIDER_IDENTIFIER] ?? null),
+                CorreiosProvider::createPromiseArray($cepWithLeftPad, $mockHandlers[CorreiosProvider::PROVIDER_IDENTIFIER] ?? null)
             );
 
             return Promise\any($promises);

@@ -12,10 +12,8 @@ class CorreiosProvider extends BaseProvider
 {
     /**
      * O nome identificador do provedor de serviço.
-     *
-     * @var string
      */
-    public $providerIdentifier = 'correios';
+    const PROVIDER_IDENTIFIER = 'correios';
 
     /**
      * Cria a Promise para obter os dados de um CEP no provedor do serviço.
@@ -113,7 +111,7 @@ class CorreiosProvider extends BaseProvider
         return function (Exception $exception) {
             throw new CepPromiseProviderException(
                 $exception->getMessage(),
-                $this->providerIdentifier
+                self::PROVIDER_IDENTIFIER
             );
         };
     }

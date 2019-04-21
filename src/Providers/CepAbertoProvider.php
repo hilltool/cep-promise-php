@@ -14,10 +14,8 @@ class CepAbertoProvider extends BaseProvider
 
     /**
      * O nome identificador do provedor de serviço.
-     *
-     * @var string
      */
-    public $providerIdentifier = 'cep_aberto';
+    const PROVIDER_IDENTIFIER = 'cep_aberto';
 
     /**
      * Cria a Promise para obter os dados de um CEP no provedor do serviço.
@@ -87,7 +85,7 @@ class CepAbertoProvider extends BaseProvider
 
             throw new CepPromiseProviderException(
                 $message ?? $exception->getMessage(),
-                $this->providerIdentifier
+                self::PROVIDER_IDENTIFIER
             );
         };
     }

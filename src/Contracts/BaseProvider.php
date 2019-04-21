@@ -3,15 +3,14 @@
 namespace Claudsonm\CepPromise\Contracts;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
 
 abstract class BaseProvider implements ProviderInterface
 {
     /**
      * O nome identificador do provedor de serviço.
-     *
-     * @var string
      */
-    public $providerIdentifier = 'base_provider';
+    const PROVIDER_IDENTIFIER = 'base_provider';
 
     /**
      * O cliente HTTP utilizado para realizar os requests.
@@ -29,10 +28,13 @@ abstract class BaseProvider implements ProviderInterface
 
     /**
      * Construtor da classe.
+     * @param  HandlerStack  $mocksHandler
      */
-    protected function __construct()
+    protected function __construct(HandlerStack $mocksHandler = null)
     {
-        $this->client = new Client();
+        $this->client = new Client([
+            'handler' => $mocksHandler
+        ]);
     }
 
     /**
@@ -40,12 +42,13 @@ abstract class BaseProvider implements ProviderInterface
      *
      * @param $cep
      *
+     * @param  HandlerStack  $mockHandler
      * @return array
      */
-    public static function createPromiseArray($cep)
+    public static function createPromiseArray($cep, HandlerStack $mockHandler = null)
     {
         $class = get_called_class();
-        $provider = new $class();
+        $provider = new $class($mockHandler);
         $provider->makePromise($cep);
 
         return $provider->toArray();
@@ -59,6 +62,6 @@ abstract class BaseProvider implements ProviderInterface
      */
     public function toArray()
     {
-        return [$this->providerIdentifier => $this->promise];
+        return [get_called_class()::PROVIDER_IDENTIFIER => $this->promise];
     }
 }

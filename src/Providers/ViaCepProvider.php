@@ -12,10 +12,8 @@ class ViaCepProvider extends BaseProvider
 {
     /**
      * O nome identificador do provedor de serviço.
-     *
-     * @var string
      */
-    public $providerIdentifier = 'via_cep';
+    const PROVIDER_IDENTIFIER = 'via_cep';
 
     /**
      * Cria a Promise para obter os dados de um CEP no provedor do serviço.
@@ -84,7 +82,7 @@ class ViaCepProvider extends BaseProvider
 
             throw new CepPromiseProviderException(
                 $message ?? $exception->getMessage(),
-                $this->providerIdentifier
+                self::PROVIDER_IDENTIFIER
             );
         };
     }
